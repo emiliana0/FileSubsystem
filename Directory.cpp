@@ -6,9 +6,10 @@ bool Directory::isDirectory() const {
     return true;
 }
 
-void Directory::add(std::shared_ptr<Node> node) {
+void Directory::add(std::shared_ptr<Node> node, const std::shared_ptr<Directory>& parent) {
     children[node->name] = node;
     time(&modificationDate);
+    node->parent = parent;
 
 }
 

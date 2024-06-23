@@ -7,7 +7,7 @@ public:
     Directory(const MyString& name);
     bool isDirectory() const override;
 
-    void add(std::shared_ptr<Node> node);
+    void add(std::shared_ptr<Node> node, const std::shared_ptr<Directory>& parent);
 
     void remove(const MyString& name);
 

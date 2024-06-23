@@ -174,6 +174,17 @@ MyString operator+(const MyString& lhs, const MyString& rhs)
     return result;
 }
 
+MyString MyString::substr(size_t begin, size_t howMany) const
+{
+    if (begin + howMany > getSize())
+        throw std::length_error("Error, Substr out of range");
+
+
+    MyString res(howMany + 1);
+    strncat(res._data, _data + begin, howMany);
+    return res;
+}
+
 bool operator==(const MyString& lhs, const MyString& rhs)
 {
     return std::strcmp(lhs.c_str(), rhs.c_str()) == 0;

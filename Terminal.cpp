@@ -37,7 +37,7 @@ void Terminal::run() {
         else if (strcmp(cmd, "touch") == 0) {
             char name[32];
             iss >> name;
-          //  fs.touch(name);
+            fs.touch(name);
         }
         else if (strcmp(cmd, "rm") == 0) {
             char path[32];

@@ -86,8 +86,8 @@ void FileSystem::mkdir(const MyString& dirName) {
         return;
     }
     std::shared_ptr<Directory> newDir = std::make_shared<Directory>(dirName);
-    newDir->parent = currentDirectory;
-    currentDirectory->add(newDir);
+    //newDir->parent = currentDirectory;
+    currentDirectory->add(newDir, currentDirectory);
 }
 
 void FileSystem::pwd() {
@@ -135,24 +135,18 @@ void FileSystem::cd(const MyString& path) {
     currentDirectory = currentDir;
 }
 
-/*void FileSystem::touch(const MyString& name) {
-    if (currentDirectory->children.find(name) != currentDirectory->children.end()) {
-        currentDirectory->children[name]->modificationDate = time(0);
+void FileSystem::touch(const MyString& name) {
+    std::shared_ptr<Directory> currentDir = currentDirectory;
+    std::map<MyString, std::shared_ptr<Node>>::iterator it = currentDir->children.find(name);
+    if (it != currentDir->children.end()) { // If the file already exist, we will change the modification date
+        std::shared_ptr<File> existingFile = std::dynamic_pointer_cast<File>(it->second);
+        std::time(&existingFile->modificationDate);
     }
     else {
-        shared_ptr<Node> newNode;
-        if (name.find(".sh") != MyString::npos) {
-            newNode = make_shared<File>(name);
-        }
-        else if (name.find(".lnk") != MyString::npos) {
-            newNode = make_shared<File>(name);
-        }
-        else {
-            newNode = make_shared<File>(name);
-        }
-        currentDirectory->add(newNode);
+        std::shared_ptr<File> newFile = std::make_shared<File>(name);
+        currentDir->add(newFile, currentDir);
     }
-}*/
+}
 
 void FileSystem::rm(const MyString& path) {
     /*shared_ptr<Node> node = navigateToNode(path);
@@ -175,10 +169,14 @@ void FileSystem::rm(const MyString& path) {
         std::cout << "File not found or path is a directory: " << path << std::endl;
         return;
     }
-    /*std::shared_ptr<Directory> parentDir = file->parent.lock();
+    //std::shared_ptr<Directory> parentDir = file->parent.lock();
+    std::shared_ptr<Directory> parentDir = std::dynamic_pointer_cast<Directory>(file->parent.lock());
     if (parentDir != nullptr) {
         parentDir->remove(file->name);
-    }*/
+    }
+    else {
+        std::cout << "Failed to find parent directory for: " << path << std::endl;
+    }
 }
 
 void FileSystem::rmdir(const MyString& path) {
@@ -224,37 +222,44 @@ std::shared_ptr<Node> FileSystem::navigateToNode(const MyString& path) {
     }
     return currentNode;
 }
-
-/*void FileSystem::exec(const std::string& filePath) {
+bool ends_with(const MyString& fullString, const MyString& ending) {
+    if (fullString.getSize() >= ending.getSize()) {
+        return fullString.substr(fullString.getSize() - ending.getSize(),ending.getSize()) == ending;
+    }
+    else {
+        return false;
+    }
+}
+/*void FileSystem::exec(const MyString& filePath) {
     std::shared_ptr<Node> node = navigateToNode(filePath);
     if (node == nullptr || node->isDirectory()) {
         std::cout << "File not found or path is a directory: " << filePath << std::endl;
         return;
     }
     std::shared_ptr<File> file = std::dynamic_pointer_cast<File>(node);
-    if (file->name.ends_with(".txt")) {
+    if (ends_with(file->name, ".txt")) {
         std::cout << file->content << std::endl;
     }
-    else if (file->name.ends_with(".sh")) {
-        std::stringstream ss(file->content);
-        std::string command;
+    else if (ends_with(file->name, ".sh")) {
+        std::stringstream ss(file->content.c_str());
+        char command[32];
         while (std::getline(ss, command)) {
             processCommand(command);
         }
     }
-    else if (file->name.ends_with(".lnk")) {
-        std::string linkPath = file->content;
+    else if (ends_with(file->name, ".lnk")) {
+        MyString linkPath = file->content.c_str();
         exec(linkPath);
     }
     else {
         std::cout << "Unknown file type: " << filePath << std::endl;
     }
-}
-void FileSystem::processCommand(const std::string& command) {
+}*/
+/*void FileSystem::processCommand(const MyString& command) {
     // Тук имплементирате логиката за изпълнение на командите от скриптовите файлове
-}
+}*/
 
-void FileSystem::find(const std::string& startPath, const std::string& searchString) {
+/*void FileSystem::find(const std::string& startPath, const std::string& searchString) {
     std::shared_ptr<Directory> startDir = navigateToDirectory(startPath);
     if (startDir == nullptr) {
         std::cout << "Invalid start path: " << startPath << std::endl;

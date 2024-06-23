@@ -25,7 +25,7 @@ public:
     void mkdir(const MyString& dirName);
     void pwd();
     void cd(const MyString& path);
-  //  void touch(const MyString& fileName);
+    void touch(const MyString& fileName);
 
     void rm(const MyString& path);
     void rmdir(const MyString& path);
