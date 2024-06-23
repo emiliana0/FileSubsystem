@@ -1,10 +1,11 @@
 #pragma once
 #include "Node.h"
+
 class File : public Node {
 public:
-    string content;
+    MyString content;
 
-    File(string name);
+    File(const MyString& name);
 
     bool isDirectory() const override;
 };

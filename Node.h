@@ -2,21 +2,21 @@
 #include <iostream>
 #include <map>
 #include <vector>
-#include <string>
 #include <ctime>
 #include <memory>
 #include <sstream>
+#include <fstream>
 #pragma warning(disable : 4996)
-using namespace std;
+#include "MyString.h"
 
 class Node {
 public:
-    string name;
+    MyString name;
     time_t creationDate;
     time_t modificationDate;
-    weak_ptr<Node> parent;// Използваме weak_ptr, за да избегнем циклични зависимости
+    std::weak_ptr<Node> parent;// Използваме weak_ptr, за да избегнем циклични зависимости
 
-    Node(string name);
+    Node(MyString name);
 
     virtual ~Node() = default;
 

@@ -1,27 +1,37 @@
 #pragma once
 #include "Directory.h"
+#include "File.h"
 
 class FileSystem {
 private:
-    shared_ptr<Directory> root;
-    shared_ptr<Directory> currentDirectory;
+    std::shared_ptr<Directory> root;
+    std::shared_ptr<Directory> currentDirectory;
 
 public:
     FileSystem();
 
-    shared_ptr<Directory> getRoot() const;
+    std::shared_ptr<Directory> getRoot() const;
 
-    shared_ptr<Directory> getCurrentDirectory() const;
+    std::shared_ptr<Directory> getCurrentDirectory() const;
 
-    void setCurrentDirectory(shared_ptr<Directory> dir);
+    void setCurrentDirectory(std::shared_ptr<Directory> dir);
 
-    vector<string> splitPath(const string& path);
-    shared_ptr<Directory> navigateToDirectory(const string& path);
+    std::vector<MyString> splitPath(const MyString& path);
+    std::shared_ptr<Directory> navigateToDirectory(const MyString& path);
+    std::shared_ptr<Node> navigateToNode(const MyString& path);
 
     void ls() const;
-    void ls(const string& path);
-    void mkdir(const string& dirName);
+    void ls(const MyString& path);
+    void mkdir(const MyString& dirName);
     void pwd();
-    void cd(const string& path);
-    // Implement other commands (touch, rm, rmdir, exec, find, echo) here
+    void cd(const MyString& path);
+  //  void touch(const MyString& fileName);
+
+    void rm(const MyString& path);
+    void rmdir(const MyString& path);
+    void exec(const MyString& path);
+    void find(const MyString& path, const MyString& searchString);
+    void echo(const MyString& text);
+    void echo(const MyString& text, const MyString& path, bool append = false);
+    // Implement other commands (rm, exec, find, echo) here
 };

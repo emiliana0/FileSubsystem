@@ -1,69 +1,69 @@
 #include "Terminal.h"
 
 void Terminal::run() {
-    string command;
+    char command[72];
     while (true) {
         fs.pwd();
-        cout << "# ";
-        getline(cin, command);
-        istringstream iss(command);
-        string cmd;
+        std::cout << "# ";
+        std::cin.getline(command, 72);
+        std::stringstream iss(command);
+        char cmd[32];
         iss >> cmd;
-        if (cmd == "exit") {
+        if (strcmp(cmd, "exit") == 0) {
             break;
         }
-        else if (cmd == "ls") {
-            string path;
+        else if (strcmp(cmd, "ls") == 0) {
+            char path[32];
             iss >> path;
-            if (path.empty())
+            if (strcmp(path, "") == 0) 
                 fs.ls();
             else
                 fs.ls(path);
         }
-        else if (cmd == "cd") {
-            string path;
+        else if (strcmp(cmd, "cd") == 0) {
+            char path[32];
             iss >> path;
             fs.cd(path);
         }
-        else if (cmd == "pwd") {
+        else if (strcmp(cmd, "pwd") == 0) {
             fs.pwd();
-            cout << endl;
+            std::cout << std::endl;
         }
-        else if (cmd == "mkdir") {
-            string name;
+        else if (strcmp(cmd, "mkdir") == 0) {
+            char name[32];
             iss >> name;
             fs.mkdir(name);
         }
-        else if (cmd == "touch") {
-            string name;
+        else if (strcmp(cmd, "touch") == 0) {
+            char name[32];
             iss >> name;
-            // Implement touch command logic here
+          //  fs.touch(name);
         }
-        else if (cmd == "rm") {
-            string path;
+        else if (strcmp(cmd, "rm") == 0) {
+            char path[32];
             iss >> path;
-            // Implement rm command logic here
+            fs.rm(path);
         }
-        else if (cmd == "rmdir") {
-            string path;
+        else if (strcmp(cmd, "rmdir") == 0) {
+            char path[32];
             iss >> path;
-            // Implement rmdir command logic here
+            fs.rmdir(path);
         }
-        else if (cmd == "exec") {
-            string path;
+        else if (strcmp(cmd, "exec") == 0) {
+            char path[32];
             iss >> path;
             // Implement exec command logic here
         }
-        else if (cmd == "find") {
-            string path, searchString;
+        else if (strcmp(cmd, "find") == 0) {
+            char path[32], searchString;
             iss >> path >> searchString;
             // Implement find command logic here
         }
-        else if (cmd == "echo") {
+        else if (strcmp(cmd, "echo") == 0) {
             // Implement echo command logic here
         }
         else {
-            cout << "Unknown command.\n";
+            std::cout << "Unknown command.\n";
         }
     }
 }

@@ -1,6 +1,6 @@
 #include "File.h"
 
-File::File(string name) : Node(name) {}
+File::File(const MyString& name) : Node(name) {}
 
 bool File::isDirectory() const {
     return false;
