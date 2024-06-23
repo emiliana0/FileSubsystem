@@ -13,7 +13,7 @@ public:
     MyString name;
     time_t creationDate;
     time_t modificationDate;
-    std::weak_ptr<Node> parent; // We are using weak_ptr to prevent loops
+    std::weak_ptr<Node> parent; 
 
     Node(MyString name);
 
@@ -21,5 +21,5 @@ public:
 
     virtual bool isDirectory() const = 0;
 
-    virtual void printDetails() const;
+    void printDetails() const;
 };

@@ -15,8 +15,6 @@ void Directory::add(std::shared_ptr<Node> node, const std::shared_ptr<Directory>
 
 void Directory::remove(const MyString& name) {
     children.erase(name);
-    //time(&modificationDate);
-
 }
 
 std::shared_ptr<Node> Directory::get(const MyString& name) {
@@ -25,6 +23,3 @@ std::shared_ptr<Node> Directory::get(const MyString& name) {
     return nullptr;
 }
 
-void Directory::printDetails() const {
-    std::cout << name << "/\t" << ctime(&creationDate) << "\t" << ctime(&modificationDate);
-}

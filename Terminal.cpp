@@ -10,7 +10,8 @@ void Terminal::run() {
         char cmd[32];
         iss >> cmd;
         if (strcmp(cmd, "exit") == 0) {
-            break;
+            //fs.exit();
+            return;
         }
         else if (strcmp(cmd, "ls") == 0) {
             char path[32];
@@ -50,14 +51,15 @@ void Terminal::run() {
             fs.rmdir(path);
         }
         else if (strcmp(cmd, "exec") == 0) {
-            char path[32];
-            iss >> path;
-            // Implement exec command logic here
+            char name[32];
+            iss >> name;
+            fs.exec(name);
         }
         else if (strcmp(cmd, "find") == 0) {
-            char path[32], searchString;
-            iss >> path >> searchString;
-            // Implement find command logic here
+            char path[32], searchString[32];
+            iss >> path;
+            iss >> searchString;
+            fs.find(path, searchString);
         }
         else if (strcmp(cmd, "echo") == 0) {
             char arg1[32];
@@ -81,7 +83,7 @@ void Terminal::run() {
                 iss >> filename;
                 fs.echoSaveToFile(arg1, filename);
             }
-            // Case 3: echo <text> >> <file>
+            
             else if (strcmp(arg1, ">>") == 0) {
                 char filename[32];
                 iss >> filename;

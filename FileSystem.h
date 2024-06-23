@@ -34,8 +34,10 @@ public:
     void echo(const MyString& text);
     void echoSaveToFile(const MyString& text, const MyString& filename);
     void echoAppendToFile(const MyString& text, const MyString& filename);
-    void exit();
+    //void exit();
+    void processCommand(const char* command);
 private:
-    void saveToFile(const MyString& filename);
-    // Implement other commands (exec, find) here
+    //void saveToFile(const MyString& filename);
+    void findRecursive(std::shared_ptr<Directory>, const MyString&, const MyString&);
+    void executeScript(const std::shared_ptr<File>& file);
 };
