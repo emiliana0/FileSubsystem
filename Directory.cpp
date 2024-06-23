@@ -25,6 +25,6 @@ std::shared_ptr<Node> Directory::get(const MyString& name) {
     return nullptr;
 }
 
-void Directory::printDetails() const{
+void Directory::printDetails() const {
     std::cout << name << "/\t" << ctime(&creationDate) << "\t" << ctime(&modificationDate);
 }

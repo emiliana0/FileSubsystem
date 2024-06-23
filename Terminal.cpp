@@ -15,7 +15,7 @@ void Terminal::run() {
         else if (strcmp(cmd, "ls") == 0) {
             char path[32];
             iss >> path;
-            if (strcmp(path, "") == 0) 
+            if (strcmp(path, "") == 0)
                 fs.ls();
             else
                 fs.ls(path);
@@ -60,7 +60,35 @@ void Terminal::run() {
             // Implement find command logic here
         }
         else if (strcmp(cmd, "echo") == 0) {
-            // Implement echo command logic here
+            char arg1[32];
+            MyString text;
+
+            while (strcmp(arg1, "<") != 0 && strcmp(arg1, "<<") != 0 && !iss.eof()) {
+                iss >> arg1;
+                text += arg1;
+                text += " ";
+
+            }
+
+            iss >> arg1;
+
+            if (strlen(arg1) == 0) {
+                fs.echo(text);
+            }
+
+            else if (strcmp(arg1, ">") == 0) {
+                char filename[32];
+                iss >> filename;
+                fs.echoSaveToFile(arg1, filename);
+            }
+            // Case 3: echo <text> >> <file>
+            else if (strcmp(arg1, ">>") == 0) {
+                char filename[32];
+                iss >> filename;
+                fs.echoAppendToFile(arg1, filename);
+            }
+            else
+                throw std::exception("Invalid input");
         }
         else {
             std::cout << "Unknown command.\n";

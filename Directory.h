@@ -3,7 +3,7 @@
 class Directory : public Node {
 public:
     std::map<MyString, std::shared_ptr<Node>> children;
-   
+
     Directory(const MyString& name);
     bool isDirectory() const override;
 

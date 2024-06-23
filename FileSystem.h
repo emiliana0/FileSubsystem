@@ -16,7 +16,7 @@ public:
 
     void setCurrentDirectory(std::shared_ptr<Directory> dir);
 
-    std::vector<MyString> splitPath(const MyString& path);
+    Vector<MyString> splitPath(const MyString& path);
     std::shared_ptr<Directory> navigateToDirectory(const MyString& path);
     std::shared_ptr<Node> navigateToNode(const MyString& path);
 
@@ -32,6 +32,10 @@ public:
     void exec(const MyString& path);
     void find(const MyString& path, const MyString& searchString);
     void echo(const MyString& text);
-    void echo(const MyString& text, const MyString& path, bool append = false);
-    // Implement other commands (rm, exec, find, echo) here
+    void echoSaveToFile(const MyString& text, const MyString& filename);
+    void echoAppendToFile(const MyString& text, const MyString& filename);
+    void exit();
+private:
+    void saveToFile(const MyString& filename);
+    // Implement other commands (exec, find) here
 };

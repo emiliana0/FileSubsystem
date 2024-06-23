@@ -43,13 +43,13 @@ void FileSystem::ls(const MyString& path) {
 }
 
 std::shared_ptr<Directory> currentDirectory = std::make_shared<Directory>("root");
-std::vector<MyString> FileSystem::splitPath(const MyString& path) {
-    std::vector<MyString> components;
+Vector<MyString> FileSystem::splitPath(const MyString& path) {
+    Vector<MyString> components;
     std::stringstream ss(path.c_str());
     char item[32];
     while (!ss.eof()) {
         ss.getline(item, 32, '/');
-        if (strcmp(item,"") != 0) {
+        if (strcmp(item, "") != 0) {
             components.push_back(item);//
         }
     }
@@ -58,20 +58,20 @@ std::vector<MyString> FileSystem::splitPath(const MyString& path) {
 }
 
 std::shared_ptr<Directory> FileSystem::navigateToDirectory(const MyString& path) {
-    std::vector<MyString> components = splitPath(path);
+    Vector<MyString> components = splitPath(path);
     std::shared_ptr<Directory> currentDir = currentDirectory;
-    for (const MyString& component : components) {
-        if (component == "..") {//navigating to parent directory
-           /* if (currentDir->parent != nullptr) {
-                currentDir = dynamic_pointer_cast<Directory>(currentDir->parent);
-            }*/
+    for (size_t i = 0; i < components.getSize(); ++i) {
+        if (components[i] == "..") {//navigating to parent directory
+            /* if (currentDir->parent != nullptr) {
+                 currentDir = dynamic_pointer_cast<Directory>(currentDir->parent);
+             }*/
             if (!currentDir->parent.expired()) {
                 currentDir = std::dynamic_pointer_cast<Directory>(currentDir->parent.lock());
             }
         }
-        else if (currentDir->children.find(component) != currentDir->children.end() &&
-            currentDir->children[component]->isDirectory()) {
-            currentDir = std::dynamic_pointer_cast<Directory>(currentDir->children[component]);
+        else if (currentDir->children.find(components[i]) != currentDir->children.end() &&
+            currentDir->children[components[i]]->isDirectory()) {
+            currentDir = std::dynamic_pointer_cast<Directory>(currentDir->children[components[i]]);
         }
         else {
             throw "Error";
@@ -91,7 +91,7 @@ void FileSystem::mkdir(const MyString& dirName) {
 }
 
 void FileSystem::pwd() {
-    std::vector<MyString> pathComponents;
+    Vector<MyString> pathComponents;
     std::shared_ptr<Node> current = currentDirectory;
 
     while (current != nullptr) {
@@ -104,28 +104,34 @@ void FileSystem::pwd() {
         }
     }
     // Printing should be moved
-    for (std::vector<MyString>::reverse_iterator i = pathComponents.rbegin(); i != pathComponents.rend(); ++i) {
-        if (i != pathComponents.rbegin())
+    for (size_t i = pathComponents.getSize(); i > 0; --i) {
+        if (i != pathComponents.getSize())
             std::cout << "/";
-        std::cout << *i;
+        std::cout << pathComponents[i - 1];
     }
     //cout << endl;
 }
 
 void FileSystem::cd(const MyString& path) {
-    // Разделяне на пътя на компоненти
-    std::vector<MyString> components = splitPath(path);
-    std::shared_ptr<Directory> currentDir = currentDirectory;
+    Vector<MyString> components = splitPath(path);
+    std::shared_ptr<Directory> currentDir;
 
-    for (const MyString& component : components) {
-        if (component == "..") {
+    if (path.c_str()[0] == '/') {
+        currentDir = root;  // Абсолютен път - започваме от кореновата директория
+    }
+    else {
+        currentDir = currentDirectory;  // Относителен път - започваме от текущата директория
+    }     
+
+    for (size_t i = 0; i < components.getSize(); ++i) {
+        if (components[i] == "..") {
             if (!currentDir->parent.expired()) {
                 currentDir = std::dynamic_pointer_cast<Directory>(currentDir->parent.lock());
             }
         }
-        else if (currentDir->children.find(component) != currentDir->children.end() &&
-            currentDir->children[component]->isDirectory()) {
-            currentDir = std::dynamic_pointer_cast<Directory>(currentDir->children[component]);
+        else if (currentDir->children.find(components[i]) != currentDir->children.end() &&
+            currentDir->children[components[i]]->isDirectory()) {
+            currentDir = std::dynamic_pointer_cast<Directory>(currentDir->children[components[i]]);
         }
         else {
             std::cout << "Invalid path: " << path << std::endl;
@@ -145,6 +151,41 @@ void FileSystem::touch(const MyString& name) {
     else {
         std::shared_ptr<File> newFile = std::make_shared<File>(name);
         currentDir->add(newFile, currentDir);
+    }
+}
+
+void FileSystem::echo(const MyString& text) {
+    std::cout << text << std::endl;
+}
+void FileSystem::echoSaveToFile(const MyString& text, const MyString& filename) {
+    std::shared_ptr<Directory> targetDir = currentDirectory;
+
+    if (targetDir->children.find(filename) == targetDir->children.end()) {
+        touch(filename);
+    }
+
+    std::shared_ptr<File> targetFile = std::dynamic_pointer_cast<File>(targetDir->children[filename]);
+    if (targetFile) {
+        targetFile->content = text;
+    }
+    else {
+        std::cout << "Error: " << filename << " is not a regular file." << std::endl;
+    }
+}
+
+void FileSystem::echoAppendToFile(const MyString& text, const MyString& filename) {
+    std::shared_ptr<Directory> targetDir = currentDirectory;
+
+    if (targetDir->children.find(filename) == targetDir->children.end()) {
+        touch(filename);
+    }
+
+    std::shared_ptr<File> targetFile = std::dynamic_pointer_cast<File>(targetDir->children[filename]);
+    if (targetFile) {
+        targetFile->content += text;  // Добавяме текста към съдържанието на файла
+    }
+    else {
+        std::cout << "Error: " << filename << " file not found." << std::endl;
     }
 }
 
@@ -199,19 +240,18 @@ void FileSystem::rmdir(const MyString& path) {
 }
 
 std::shared_ptr<Node> FileSystem::navigateToNode(const MyString& path) {
-    std::vector<MyString> components = splitPath(path);
+    Vector<MyString> components = splitPath(path);
     std::shared_ptr<Directory> currentDir = currentDirectory;
     std::shared_ptr<Node> currentNode = currentDir;
-    for (std::vector<MyString>::iterator it = components.begin(); it != components.end(); ++it) {
-        const MyString& component = *it;
-        if (component == "..") {
+    for (size_t i = 0; i < components.getSize(); ++i) {
+        if (components[i] == "..") {
             if (!currentDir->parent.expired()) {
                 currentNode = currentDir->parent.lock();
                 currentDir = std::dynamic_pointer_cast<Directory>(currentNode);
             }
         }
-        else if (currentDir->children.find(component) != currentDir->children.end()) {
-            currentNode = currentDir->children[component];
+        else if (currentDir->children.find(components[i]) != currentDir->children.end()) {
+            currentNode = currentDir->children[components[i]];
             if (currentNode->isDirectory()) {
                 currentDir = std::dynamic_pointer_cast<Directory>(currentNode);
             }
@@ -224,12 +264,101 @@ std::shared_ptr<Node> FileSystem::navigateToNode(const MyString& path) {
 }
 bool ends_with(const MyString& fullString, const MyString& ending) {
     if (fullString.getSize() >= ending.getSize()) {
-        return fullString.substr(fullString.getSize() - ending.getSize(),ending.getSize()) == ending;
+        return fullString.substr(fullString.getSize() - ending.getSize(), ending.getSize()) == ending;
     }
     else {
         return false;
     }
 }
+
+/*void FileSystem::exit() {
+    saveToFile("filesystem_state.txt"); // Запазваме текущото състояние на файловата система
+    std::cout << "Exiting the file system.\n";
+    // Тук може да изведете допълнително съобщение, ако е необходимо
+    return; // Затваряме приложението с код за успешно завършване
+}
+
+void FileSystem::saveToFile(const MyString& filename) {
+    std::ofstream file(filename.c_str());
+    if (!file.is_open()) 
+        throw std::exception("Error: Unable to open file for writing.\n");
+
+    // Write the current directory path
+    file << currentDirectory->getP() << std::endl;
+
+    // Recursively save the file system structure
+    saveNodeToFile(currentDirectory, file);
+
+    file.close();
+}
+
+void FileSystem::saveNodeToFile(std::shared_ptr<Node> node, std::ofstream& file) {
+    if (node == nullptr)
+        return;
+
+    // Save the node's information
+    file << node->getType() << " " << node->getName() << std::endl;
+
+    // If it's a directory, recursively save its children
+    if (node->getType() == NodeType::Directory) {
+        std::shared_ptr<Directory> directory = std::dynamic_pointer_cast<Directory>(node);
+        for (const auto& pair : directory->getChildren()) {
+            saveNodeToFile(pair.second, file);
+        }
+    }
+}
+
+Метод за възстановяване от файл(FileSystem::restoreFromFile) :
+
+    cpp
+
+    void FileSystem::restoreFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Unable to open file " << filename << " for reading.\n";
+        return;
+    }
+
+    // Read the current directory path
+    std::string currentDirPath;
+    std::getline(file, currentDirPath);
+
+    // Restore the file system structure
+    currentDirectory = restoreNodeFromFile(file, nullptr);
+
+    file.close();
+
+    // Set the current directory to the restored path
+    cd(currentDirPath);
+}
+
+std::shared_ptr<Node> FileSystem::restoreNodeFromFile(std::ifstream& file, std::shared_ptr<Directory> parent) {
+    std::string line;
+    std::getline(file, line);
+    if (line.empty()) {
+        return nullptr;
+    }
+
+    std::stringstream ss(line);
+    std::string typeStr, name;
+    ss >> typeStr >> name;
+
+    NodeType type = (typeStr == "Directory") ? NodeType::Directory : NodeType::File;
+    std::shared_ptr<Node> node = (type == NodeType::Directory) ? std::make_shared<Directory>(name, parent) : std::make_shared<File>(name, parent);
+
+    // If it's a directory, recursively restore its children
+    if (type == NodeType::Directory) {
+        std::shared_ptr<Directory> directory = std::dynamic_pointer_cast<Directory>(node);
+        while (std::getline(file, line)) {
+            std::shared_ptr<Node> child = restoreNodeFromFile(file, directory);
+            if (child != nullptr) {
+                directory->addChild(child);
+            }
+        }
+    }
+
+    return node;
+}*/
 /*void FileSystem::exec(const MyString& filePath) {
     std::shared_ptr<Node> node = navigateToNode(filePath);
     if (node == nullptr || node->isDirectory()) {
@@ -256,7 +385,7 @@ bool ends_with(const MyString& fullString, const MyString& ending) {
     }
 }*/
 /*void FileSystem::processCommand(const MyString& command) {
-    // Тук имплементирате логиката за изпълнение на командите от скриптовите файлове
+    // ??? ?????????????? ???????? ?? ?????????? ?? ????????? ?? ??????????? ???????
 }*/
 
 /*void FileSystem::find(const std::string& startPath, const std::string& searchString) {
@@ -286,6 +415,7 @@ void exitApplication() {
     saveCurrentDirectory();
     std::exit(0);
 }
+
 
 void saveFileSystem() {
     // Имплементация на сериализацията на файловата система
