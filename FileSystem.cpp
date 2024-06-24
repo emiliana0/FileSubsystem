@@ -27,7 +27,7 @@ void FileSystem::ls() const {
     std::cout << std::endl;
 }
 
-void FileSystem::ls(const MyString& path) {
+void FileSystem::ls(const MyString& path) const {
     std::shared_ptr<Directory> dir = navigateToDirectory(path);
     if (dir == nullptr) {
         std::cout << "Invalid path: " << path << std::endl;
@@ -43,7 +43,7 @@ void FileSystem::ls(const MyString& path) {
 }
 
 std::shared_ptr<Directory> currentDirectory = std::make_shared<Directory>("root");
-Vector<MyString> FileSystem::splitPath(const MyString& path) {
+Vector<MyString> FileSystem::splitPath(const MyString& path) const {
     Vector<MyString> components;
     std::stringstream ss(path.c_str());
     char item[32];
@@ -57,7 +57,7 @@ Vector<MyString> FileSystem::splitPath(const MyString& path) {
     return components;
 }
 
-std::shared_ptr<Directory> FileSystem::navigateToDirectory(const MyString& path) {
+std::shared_ptr<Directory> FileSystem::navigateToDirectory(const MyString& path)  const {
     Vector<MyString> components = splitPath(path);
     std::shared_ptr<Directory> currentDir = currentDirectory;
     for (size_t i = 0; i < components.getSize(); ++i) {
@@ -77,7 +77,7 @@ std::shared_ptr<Directory> FileSystem::navigateToDirectory(const MyString& path)
     return currentDir;
 }
 
-void FileSystem::mkdir(const MyString& dirName) {
+void FileSystem::mkdir(const MyString& dirName) const {
     if (currentDirectory->children.find(dirName) != currentDirectory->children.end()) 
         throw std::exception("Directory or file already exists");
 
@@ -85,7 +85,7 @@ void FileSystem::mkdir(const MyString& dirName) {
     currentDirectory->add(newDir, currentDirectory);
 }
 
-void FileSystem::pwd() {
+void FileSystem::pwd() const {
     Vector<MyString> pathComponents;
     std::shared_ptr<Node> current = currentDirectory;
 
@@ -133,7 +133,7 @@ void FileSystem::cd(const MyString& path) {
     currentDirectory = currentDir;
 }
 
-void FileSystem::touch(const MyString& name) {
+void FileSystem::touch(const MyString& name) const {
     std::shared_ptr<Directory> currentDir = currentDirectory;
     std::map<MyString, std::shared_ptr<Node>>::iterator it = currentDir->children.find(name);
     if (it != currentDir->children.end()) { 
@@ -146,10 +146,10 @@ void FileSystem::touch(const MyString& name) {
     }
 }
 
-void FileSystem::echo(const MyString& text) {
+void FileSystem::echo(const MyString& text) const {
     std::cout << text << std::endl;
 }
-void FileSystem::echoSaveToFile(const MyString& text, const MyString& filename) {
+void FileSystem::echoSaveToFile(const MyString& text, const MyString& filename) const {
     std::shared_ptr<Directory> targetDir = currentDirectory;
 
     if (targetDir->children.find(filename) == targetDir->children.end()) {
@@ -164,7 +164,7 @@ void FileSystem::echoSaveToFile(const MyString& text, const MyString& filename) 
         throw std::exception("File not valid");
 }
 
-void FileSystem::echoAppendToFile(const MyString& text, const MyString& filename) {
+void FileSystem::echoAppendToFile(const MyString& text, const MyString& filename) const {
     std::shared_ptr<Directory> targetDir = currentDirectory;
 
     if (targetDir->children.find(filename) == targetDir->children.end()) {
@@ -180,7 +180,7 @@ void FileSystem::echoAppendToFile(const MyString& text, const MyString& filename
     }
 }
 
-void FileSystem::rm(const MyString& path) {
+void FileSystem::rm(const MyString& path) const {
     std::shared_ptr<Node> file = navigateToNode(path);
     if (file == nullptr || file->isDirectory()) {
         std::cout << "File not found or path is a directory: " << path << std::endl;
@@ -212,7 +212,7 @@ void FileSystem::rmdir(const MyString& path) {
     }
 }
 
-std::shared_ptr<Node> FileSystem::navigateToNode(const MyString& path) {
+std::shared_ptr<Node> FileSystem::navigateToNode(const MyString& path) const {
     Vector<MyString> components = splitPath(path);
     std::shared_ptr<Directory> currentDir = currentDirectory;
     std::shared_ptr<Node> currentNode = currentDir;
@@ -450,7 +450,7 @@ void FileSystem::exec(const MyString& filePath) {
     }
 }
 
-void FileSystem::find(const MyString& startPath, const MyString& searchString) {
+void FileSystem::find(const MyString& startPath, const MyString& searchString) const {
     std::shared_ptr<Directory> startDir = navigateToDirectory(startPath);
     if (startDir == nullptr) {
         std::cout << "Invalid start path: " << startPath << std::endl;
@@ -467,7 +467,7 @@ bool containsSubstring(const MyString& str, const MyString& substr) {
     return false;
 }
 
-void FileSystem::findRecursive(std::shared_ptr<Directory> dir, const MyString& searchString, const MyString& currentPath) {
+void FileSystem::findRecursive(std::shared_ptr<Directory> dir, const MyString& searchString, const MyString& currentPath) const {
     for (const std::pair<const MyString, std::shared_ptr<Node>>& entry : dir->children) {
         const MyString& name = entry.first;
         std::shared_ptr<Node> node = entry.second;
