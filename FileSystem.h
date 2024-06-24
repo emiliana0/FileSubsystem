@@ -16,10 +16,6 @@ public:
 
     void setCurrentDirectory(std::shared_ptr<Directory> dir);
 
-    Vector<MyString> splitPath(const MyString& path);
-    std::shared_ptr<Directory> navigateToDirectory(const MyString& path);
-    std::shared_ptr<Node> navigateToNode(const MyString& path);
-
     void ls() const;
     void ls(const MyString& path);
     void mkdir(const MyString& dirName);
@@ -37,6 +33,9 @@ public:
     //void exit();
     void processCommand(const char* command);
 private:
+    Vector<MyString> splitPath(const MyString& path);
+    std::shared_ptr<Directory> navigateToDirectory(const MyString& path);
+    std::shared_ptr<Node> navigateToNode(const MyString& path);
     //void saveToFile(const MyString& filename);
     void findRecursive(std::shared_ptr<Directory>, const MyString&, const MyString&);
     void executeScript(const std::shared_ptr<File>& file);
