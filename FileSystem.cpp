@@ -118,7 +118,7 @@ void FileSystem::cd(const MyString& path) {
     }     
 
     for (size_t i = 0; i < components.getSize(); ++i) {
-        if (components[i] == "..") {
+        if (operator==(components[i], "..")) {
             if (!currentDir->parent.expired()) {
                 currentDir = std::dynamic_pointer_cast<Directory>(currentDir->parent.lock());
             }
