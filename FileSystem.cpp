@@ -78,10 +78,9 @@ std::shared_ptr<Directory> FileSystem::navigateToDirectory(const MyString& path)
 }
 
 void FileSystem::mkdir(const MyString& dirName) {
-    if (currentDirectory->children.find(dirName) != currentDirectory->children.end()) {
-        std::cout << "Directory or file already exists: " << dirName << std::endl;
-        return;
-    }
+    if (currentDirectory->children.find(dirName) != currentDirectory->children.end()) 
+        throw std::exception("Directory or file already exists");
+
     std::shared_ptr<Directory> newDir = std::make_shared<Directory>(dirName);
     currentDirectory->add(newDir, currentDirectory);
 }
